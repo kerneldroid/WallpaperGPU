@@ -33,7 +33,8 @@ private const val TAG = "WgpuWebBridge"
 class WgpuWebBridge(
 	private val webViewProvider: () -> WebView?,
 	private val onBridgeReadyCallback: (slug: String, version: String) -> Unit = { _, _ -> },
-	private val onStaticFrameCallback: (slug: String, frozen: Boolean, reason: String) -> Unit = { _, _, _ -> }
+	private val onStaticFrameCallback: (slug: String, frozen: Boolean, reason: String) -> Unit = { _, _, _ -> },
+	private val onGpuStatusCallback: (supported: Boolean, error: String) -> Unit = { _, _ -> }
 ) {
 	private val mainHandler = Handler(Looper.getMainLooper())
 
@@ -47,6 +48,12 @@ class WgpuWebBridge(
 	fun onStaticFrameState(slug: String, frozen: Boolean, reason: String) {
 		Log.d(TAG, "Smart Static Snapshot state for '$slug': frozen=$frozen ($reason)")
 		mainHandler.post { onStaticFrameCallback(slug, frozen, reason) }
+	}
+
+	@JavascriptInterface
+	fun onGpuStatus(supported: Boolean, error: String) {
+		Log.w(TAG, "WebGPU status: supported=$supported error=$error")
+		mainHandler.post { onGpuStatusCallback(supported, error) }
 	}
 
 	fun dispatchTouch(action: String, x: Float, y: Float, pointerId: Int, pressure: Float) {

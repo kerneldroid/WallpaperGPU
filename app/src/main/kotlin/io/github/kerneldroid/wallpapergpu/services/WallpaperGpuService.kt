@@ -31,6 +31,7 @@ import android.util.Log
 import android.view.MotionEvent
 import android.view.SurfaceHolder
 import android.view.ViewGroup
+import android.webkit.RenderProcessGoneDetail
 import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
 import android.webkit.WebSettings
@@ -84,6 +85,10 @@ class WallpaperGpuService : WallpaperService() {
 		private var currentPrefs = EnginePreferences()
 		private var surfaceWidth = 1080
 		private var surfaceHeight = 2400
+		private var builtSurfaceWidth = 0
+		private var builtSurfaceHeight = 0
+		private var isRebuilding = false
+		private var gpuFallbackShown = false
 
 		private val batteryReceiver = object : BroadcastReceiver() {
 			override fun onReceive(context: Context?, intent: Intent?) {
@@ -110,6 +115,9 @@ class WallpaperGpuService : WallpaperService() {
 				webViewProvider = { webView },
 				onBridgeReadyCallback = { slug, _ ->
 					pushInitialThemeState(slug)
+				},
+				onGpuStatusCallback = { supported, error ->
+					if (!supported) showGpuFallback(error)
 				}
 			)
 
@@ -161,9 +169,22 @@ class WallpaperGpuService : WallpaperService() {
 			height: Int
 		) {
 			super.onSurfaceChanged(holder, format, width, height)
-			surfaceWidth = width.coerceAtLeast(1)
-			surfaceHeight = height.coerceAtLeast(1)
-			rebuildVirtualDisplayAndWebView(holder, surfaceWidth, surfaceHeight)
+			if (!holder.surface.isValid || width <= 0 || height <= 0) return
+			val nextWidth = width.coerceAtLeast(1)
+			val nextHeight = height.coerceAtLeast(1)
+			if (isRebuilding) return
+			if (webView != null && nextWidth == builtSurfaceWidth && nextHeight == builtSurfaceHeight) return
+			surfaceWidth = nextWidth
+			surfaceHeight = nextHeight
+			isRebuilding = true
+			try {
+				rebuildVirtualDisplayAndWebView(holder, surfaceWidth, surfaceHeight)
+			} catch (err: Throwable) {
+				Log.e(TAG, "Failed to rebuild the wallpaper surface", err)
+				teardownVirtualDisplay()
+			} finally {
+				isRebuilding = false
+			}
 		}
 
 		override fun onVisibilityChanged(visible: Boolean) {
@@ -290,6 +311,31 @@ class WallpaperGpuService : WallpaperService() {
 						super.onPageFinished(view, url)
 						loadedThemeSlug?.let { pushInitialThemeState(it) }
 					}
+
+					override fun onRenderProcessGone(
+						view: WebView?,
+						detail: RenderProcessGoneDetail?
+					): Boolean {
+						Log.e(TAG, "WebView renderer gone (didCrash=${detail?.didCrash()})")
+						val width = surfaceWidth
+						val height = surfaceHeight
+						view?.postDelayed({
+							if (view === webView) {
+								teardownVirtualDisplay()
+								if (width > 0 && height > 0 && surfaceHolder.surface.isValid) {
+									isRebuilding = true
+									try {
+										rebuildVirtualDisplayAndWebView(surfaceHolder, width, height)
+									} catch (err: Throwable) {
+										Log.e(TAG, "Recovery after renderer crash failed", err)
+									} finally {
+										isRebuilding = false
+									}
+								}
+							}
+						}, 400L)
+						return true
+					}
 				}
 			}
 			webView = wv
@@ -299,6 +345,8 @@ class WallpaperGpuService : WallpaperService() {
 				show()
 			}
 			presentation = pres
+			builtSurfaceWidth = width
+			builtSurfaceHeight = height
 
 			loadedThemeSlug = null
 			loadThemeIfNeeded(currentPrefs.activeThemeSlug)
@@ -314,6 +362,7 @@ class WallpaperGpuService : WallpaperService() {
 
 			if (loadedThemeSlug == target.slug) return
 			loadedThemeSlug = target.slug
+			gpuFallbackShown = false
 
 			val url = "https://$SECURE_THEME_DOMAIN/themes/${target.slug}/${target.entrypoint}"
 			Log.i(TAG, "Loading WebGPU .theme package '${target.name}' from $url")
@@ -332,6 +381,36 @@ class WallpaperGpuService : WallpaperService() {
 				dprScale = (currentPrefs.renderScalePercent / 100f).coerceIn(0.4f, 1.0f),
 				paused = !currentPrefs.engineEnabled
 			)
+		}
+
+		/** Load a lightweight Canvas2D message instead of a WebGPU theme on unsupported devices. */
+		private fun showGpuFallback(error: String) {
+			if (gpuFallbackShown) return
+			gpuFallbackShown = true
+			val wv = webView ?: return
+			Log.w(TAG, "WebGPU unavailable, showing fallback: $error")
+			val html = """
+				<!doctype html><html><head><meta charset="utf-8">
+				<meta name="viewport" content="width=device-width,initial-scale=1">
+				<style>
+				html,body{margin:0;height:100%;overflow:hidden;background:#08111f;color:#e2e8f0;font:16px/1.5 system-ui,sans-serif}
+				canvas{position:fixed;inset:0;width:100%;height:100%}
+				main{position:relative;display:grid;place-items:center;height:100%;padding:24px;box-sizing:border-box;text-align:center}
+				.card{max-width:34rem;padding:24px;border-radius:24px;background:rgba(8,17,31,.72);border:1px solid rgba(56,189,248,.35);backdrop-filter:blur(12px)}
+				h1{margin:0 0 8px;font-size:24px}p{margin:0;color:#b8c4d9}
+				</style></head><body>
+				<canvas id="c"></canvas>
+				<main><div class="card"><h1>WebGPU is not available</h1>
+				<p>This device's WebView cannot create a WebGPU adapter, so this wallpaper cannot render. Try a device with a Vulkan-capable GPU and a WebView/Chromium build with WebGPU enabled.</p></div></main>
+				<script>
+				const c=document.getElementById('c'),x=c.getContext('2d');let t=0;
+				function f(){requestAnimationFrame(f);c.width=innerWidth;c.height=innerHeight;
+				const g=x.createLinearGradient(0,0,c.width,c.height);g.addColorStop(0,'#08111f');g.addColorStop(.55,'#14224a');g.addColorStop(1,'#0e7490');
+				x.fillStyle=g;x.fillRect(0,0,c.width,c.height);x.strokeStyle='rgba(139,92,246,.45)';x.lineWidth=2;
+				for(let i=0;i<10;i++){x.beginPath();for(let px=0;px<=c.width;px+=24){const y=(c.height/10)*i+Math.sin(px*.008+t+i*.5)*22;if(px===0)x.moveTo(px,y);else x.lineTo(px,y)}x.stroke()}t+=.02}f();
+				</script></body></html>
+			""".trimIndent()
+			wv.loadDataWithBaseURL("https://$SECURE_THEME_DOMAIN/", html, "text/html", "utf-8", null)
 		}
 
 		private fun applySmartStaticFreeze(frozen: Boolean, reason: String) {
@@ -375,6 +454,8 @@ class WallpaperGpuService : WallpaperService() {
 			webView = null
 			runCatching { virtualDisplay?.release() }
 			virtualDisplay = null
+			builtSurfaceWidth = 0
+			builtSurfaceHeight = 0
 		}
 	}
 }
