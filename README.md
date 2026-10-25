@@ -79,7 +79,7 @@ Themes are rendered by the Android system WebView through WebGPU. WebGPU must be
 
 ## Templates
 
-The companion template studio is [kerneldroid/lw-webgpu-wallpapers](https://github.com/kerneldroid/lw-webgpu-wallpapers). Download a `<slug>.theme` file from the gallery and import it with **Import .theme**, or open the file directly from a file manager.
+The companion template studio is the WebGPU wallpaper gallery. Download a `<slug>.theme` file from the gallery and import it with **Import .theme**, or open the file directly from a file manager.
 
 ## Credits
 
