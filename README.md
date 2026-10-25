@@ -50,7 +50,7 @@ WallpaperGPU/
 ### Prerequisites
 
 - JDK 21 (the Gradle daemon JVM is pinned in `app/gradle/gradle-daemon-jvm.properties`)
-- Android SDK with platform 36 and build-tools 36.0.0
+- Android SDK with platform 36 and build-tools 35.0.0 or newer
 - `ANDROID_HOME` set, or `app/local.properties` containing `sdk.dir=/path/to/Android/Sdk`
 
 ### 1. Rust Native Core (optional, `libwallpapergpu_core.so`)

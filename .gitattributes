@@ -1,0 +1,4 @@
+* text=auto
+*.bat text eol=crlf
+app/gradlew text eol=lf
+app/src/main/res/raw/nunito_ofl.txt text eol=crlf
