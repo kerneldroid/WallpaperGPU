@@ -1,0 +1,18 @@
+WallpaperGPU
+Copyright (C) 2026 kerneldroid (https://github.com/kerneldroid/WallpaperGPU)
+
+WallpaperGPU is free software: you can redistribute it and/or modify it under the terms of the
+GNU General Public License as published by the Free Software Foundation, either version 3 of the
+License, or (at your option) any later version.
+
+This product includes UI architecture, Material 3 Expressive preference card components, Nunito
+typography configuration, and ambient/proximity sensor management patterns adapted from:
+
+  Adaptive Theme (Hecate)
+  Copyright (C) 2024-2026 xLexip <https://lexip.dev>
+  Repository: https://github.com/xLexip/Adaptive-Theme
+  License: GNU General Public License v3.0 or later
+
+This product uses the Nunito font family:
+  Copyright 2014 The Nunito Project Authors (https://github.com/googlefonts/nunito)
+  Licensed under the SIL Open Font License, Version 1.1.

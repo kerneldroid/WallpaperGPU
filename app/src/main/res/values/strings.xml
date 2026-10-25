@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string name="app_name" translatable="false">WallpaperGPU</string>
+	<string name="wallpaper_service_label" translatable="false">WallpaperGPU Live Engine</string>
+	<string name="wallpaper_service_author" translatable="false">kerneldroid (Rust + Kotlin)</string>
+	<string name="wallpaper_service_description">WebGPU live wallpaper engine with touch reactivity, parallax bridge, and smart static idle conversion.</string>
+
+	<!-- Main Switch & Import -->
+	<string name="title_enable_wallpapergpu">Enable WallpaperGPU Engine</string>
+	<string name="action_import_theme">Import .theme Wallpaper</string>
+	<string name="subtitle_import_theme">Load a WebGPU .theme package into the Material 3 carousel</string>
+
+	<!-- MD3 Carousel Section -->
+	<string name="section_carousel_title">Imported .theme Wallpapers</string>
+	<string name="section_carousel_subtitle">Swipe the Material 3 carousel and tap any wallpaper to apply it as your Live Wallpaper</string>
+	<string name="carousel_empty_title">No .theme Wallpapers Imported Yet</string>
+	<string name="carousel_empty_body">Tap \"Import .theme Wallpaper\" above to load a .theme archive exported from the WebGPU template studio.</string>
+	<string name="badge_active_wallpaper">ACTIVE</string>
+	<string name="action_apply_as_wallpaper">Apply as Wallpaper</string>
+	<string name="action_set_live_wallpaper">Apply as Live Wallpaper</string>
+	<string name="action_remove_theme">Remove from Library</string>
+
+	<!-- Smart Static Conversion Section -->
+	<string name="section_smart_static">Smart Static Optimization</string>
+	<string name="title_smart_static_freeze">Smart Static Freeze</string>
+	<string name="description_smart_static_freeze">Automatically convert the live WebGPU wallpaper into a static image (0% GPU usage) when nobody is looking at the wallpaper</string>
+	<string name="title_proximity_pocket_freeze">Proximity &amp; Pocket Freeze</string>
+	<string name="description_proximity_pocket_freeze">Freeze rendering when the proximity sensor detects the phone is face-down or in a pocket</string>
+	<string name="title_idle_timeout">Touch Inactivity Freeze</string>
+	<string name="description_idle_timeout">Convert to static frame after %1$d seconds without home-screen interaction</string>
+	<string name="title_gpu_runtime_status">Engine &amp; Sensor Telemetry</string>
+	<string name="status_live_rendering">Live WebGPU Rendering (%1$d FPS cap)</string>
+	<string name="status_static_frozen">Static Snapshot Active (0%% GPU · %1$s)</string>
+
+	<!-- API Bridge & Performance Section -->
+	<string name="section_bridge_settings">WallpaperGPU API Bridge</string>
+	<string name="title_touch_bridge">Touch &amp; Ripple Bridge</string>
+	<string name="description_touch_bridge">Forward screen touches and multi-touch gestures to the WebGPU shader</string>
+	<string name="title_parallax_bridge">Launcher Swipe Parallax</string>
+	<string name="description_parallax_bridge">Forward home-screen page swipe offsets (onOffsetsChanged) to the scene camera</string>
+	<string name="title_sensor_tilt_bridge">Gyroscope &amp; Tilt Bridge</string>
+	<string name="description_sensor_tilt_bridge">Stream device orientation and accelerometer vectors to window.WallpaperGPU</string>
+	<string name="title_target_fps">Target Frame Rate</string>
+	<string name="description_target_fps">%1$d FPS ceiling when actively viewing the home screen</string>
+	<string name="title_render_scale">Render Resolution Scale</string>
+	<string name="description_render_scale">%1$d%% native device pixel ratio</string>
+
+	<!-- GitHub & Adaptive Theme Credits -->
+	<string name="github_star_prompt_title">Enjoying WallpaperGPU?</string>
+	<string name="github_star_prompt_body">WallpaperGPU is open-source under the GNU GPL v3. Star kerneldroid/WallpaperGPU on GitHub!</string>
+	<string name="github_star_prompt_action">Star on GitHub</string>
+	<string name="github_star_prompt_dismiss">Not now</string>
+	<string name="github_repo_url" translatable="false">https://github.com/kerneldroid/WallpaperGPU</string>
+	<string name="adaptive_theme_repo_url" translatable="false">https://github.com/xLexip/Adaptive-Theme</string>
+	<string name="developer_url" translatable="false">https://lexip.dev</string>
+
+	<!-- Three Dot Menu & Credits -->
+	<string name="more_options">More options</string>
+	<string name="menu_github_repo">WallpaperGPU on GitHub</string>
+	<string name="menu_adaptive_theme_credits">UI Credits: Adaptive Theme (xLexip)</string>
+	<string name="menu_import_sample_theme">Load Built-in Demo .theme</string>
+	<string name="credits_card_title">UI Foundation &amp; License</string>
+	<string name="credits_card_body">UI layout &amp; Material 3 Expressive cards based on Adaptive Theme by xLexip (lexip.dev). Licensed under the GNU GPL v3.</string>
+</resources>

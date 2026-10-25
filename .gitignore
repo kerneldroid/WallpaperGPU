@@ -1,0 +1,31 @@
+# Gradle / Android build output
+.gradle/
+build/
+app/build/
+local.properties
+captures/
+.externalNativeBuild/
+.cxx/
+*.iml
+.idea/
+
+# Release artifacts (uploaded to GitHub Releases, not committed)
+dist/
+*.apk
+*.aab
+
+# Signing material must never be committed
+*.jks
+*.keystore
+keystore.properties
+signing.properties
+*.p12
+*.pem
+
+# Rust
+target/
+rust/wallpapergpu-core/target/
+
+# OS / editor
+.DS_Store
+*.log

@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:tools="http://schemas.android.com/tools">
+
+	<!-- Required for Live Wallpaper Picker and Hardware Accelerated WebGPU Surface -->
+	<uses-feature
+		android:name="android.software.live_wallpaper"
+		android:required="true" />
+	<uses-feature
+		android:name="android.hardware.sensor.proximity"
+		android:required="false" />
+	<uses-feature
+		android:name="android.hardware.sensor.light"
+		android:required="false" />
+	<uses-feature
+		android:name="android.hardware.sensor.gyroscope"
+		android:required="false" />
+
+	<application
+		android:name=".Application"
+		android:allowBackup="true"
+		android:dataExtractionRules="@xml/data_extraction_rules"
+		android:fullBackupContent="@xml/backup_rules"
+		android:hardwareAccelerated="true"
+		android:icon="@mipmap/ic_launcher"
+		android:label="@string/app_name"
+		android:roundIcon="@mipmap/ic_launcher"
+		android:supportsRtl="true"
+		android:theme="@style/Theme.App.Starting"
+		tools:targetApi="36">
+
+		<activity
+			android:name=".ui.MainActivity"
+			android:exported="true"
+			android:launchMode="singleTop">
+			<intent-filter>
+				<action android:name="android.intent.action.MAIN" />
+				<category android:name="android.intent.category.LAUNCHER" />
+			</intent-filter>
+
+			<!-- Direct .theme file opening support -->
+			<intent-filter>
+				<action android:name="android.intent.action.VIEW" />
+				<category android:name="android.intent.category.DEFAULT" />
+				<category android:name="android.intent.category.BROWSABLE" />
+				<data android:scheme="content" />
+				<data android:scheme="file" />
+				<data android:mimeType="*/*" />
+				<data android:pathPattern=".*\\.theme" />
+			</intent-filter>
+		</activity>
+
+		<!-- WallpaperGPU Live Wallpaper Service -->
+		<service
+			android:name=".services.WallpaperGpuService"
+			android:enabled="true"
+			android:exported="true"
+			android:label="@string/wallpaper_service_label"
+			android:permission="android.permission.BIND_WALLPAPER">
+			<intent-filter>
+				<action android:name="android.service.wallpaper.WallpaperService" />
+			</intent-filter>
+			<meta-data
+				android:name="android.service.wallpaper"
+				android:resource="@xml/wallpaper_gpu" />
+		</service>
+
+	</application>
+
+</manifest>
